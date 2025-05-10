@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'package:study_app/assets/MyColors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,190 +22,198 @@ class _LoginScreenState extends State<LoginScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ClipPath(
-              clipper: WaveClipperOne(),
-              child: Container(
-                width: double.infinity,
-                height: screenHeight * 0.3,
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.white, Color(0xFF00B4DB)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+      backgroundColor: MyColors.backgroundColor,
+      body: Padding(
+          padding: EdgeInsets.all(30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Đăng nhập",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenWidth * 0.08,
+                    color: Colors.white
                 ),
-                alignment: Alignment.centerLeft,
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-              child: Align(
-                alignment: Alignment.centerLeft,
+              const SizedBox(height: 30,),
+              Form(
+                key: _signInFormKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Hello",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: screenWidth * 0.15,
-                        color: Colors.blueGrey,
+                    TextFormField(
+                      controller: _emailController,
+                      style: const TextStyle(
+                        color: Colors.white,
                       ),
+                      decoration: InputDecoration(
+                        hintText: 'Email hoặc tên người dùng...',
+                        hintStyle: const TextStyle(
+                            color: Colors.white70
+                        ),
+                        filled: true,
+                        fillColor: MyColors.searchInput,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        errorStyle: const TextStyle(
+                          color: Colors.yellow,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14
+                        ),
+                      ),
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Bạn chưa nhập tên tài khoản';
+                        }
+                        return null;
+                      },
                     ),
-                    Text(
-                      "Sign in to your account",
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.05,
+                    const SizedBox(height: 30,),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: _isShowPassWord,
+                      style: const TextStyle(
+                        color: Colors.white,
                       ),
+                      decoration: InputDecoration(
+                        hintText: 'Mật khẩu...',
+                        hintStyle: const TextStyle(
+                            color: Colors.white70
+                        ),
+                        filled: true,
+                        fillColor: MyColors.searchInput,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        errorStyle: const TextStyle(
+                            color: Colors.yellow,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isShowPassWord
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isShowPassWord = !_isShowPassWord;
+                            });
+                          },
+                        ),
+                      ),
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Bạn chưa nhập mật khẩu';
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Form(
-                        key: _signInFormKey,
-                        child: Column(
-                          children: [
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter your email...',
-                                hintStyle: const TextStyle(
-                                  color: Colors.grey,
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              validator: (String? value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your email';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 30),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: _isShowPassWord,
-                              decoration: InputDecoration(
-                                hintText: 'Enter your password...',
-                                hintStyle: const TextStyle(
-                                  color: Colors.grey,
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: BorderSide.none,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _isShowPassWord
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isShowPassWord = !_isShowPassWord;
-                                    });
-                                  },
-                                ),
-                              ),
-                              validator: (String? value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your password';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 70),
-                            FractionallySizedBox(
-                              widthFactor: 0.8,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [Colors.white, Color(0xFF00B4DB)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    if (_signInFormKey.currentState!.validate()) {
-                                      final email = _emailController.text.trim();
-                                      final password = _passwordController.text;
-                                      //goi API login o day
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 16),
-                                    backgroundColor: Colors.transparent, // Đảm bảo không có nền mặc định
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'SIGN IN',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+              const SizedBox(height: 30,),
+              GestureDetector(
+                onTap: () {
+                  if (_signInFormKey.currentState!.validate()) {
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text;
+                    //goi API login o day
+                  }
+                },
+                child: Container(
+                    width: screenWidth,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: MyColors.loginBtn,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Đăng nhập',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: screenWidth * 0.035,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Don't have an account?",
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              //Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
-                            },
-                            child: const Text(
-                              "Create",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    )
                 ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 10,),
+              Center(
+                child: TextButton(
+                    onPressed: () {
+
+                    },
+                    child: Text(
+                      "Quên mật khẩu",
+                      style: TextStyle(
+                          color: Colors.indigo,
+                          fontSize: screenWidth * 0.035,
+                          fontWeight: FontWeight.bold,
+                      ),
+                    )
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+
+                },
+                child: Container(
+                    width: screenWidth,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                      'Tiếp tục với Google',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: screenWidth * 0.035,
+                      ),
+                    ),
+                    )
+                ),
+              ),
+              const SizedBox(height: 15,),
+              GestureDetector(
+                onTap: () {
+
+                },
+                child: Container(
+                    width: screenWidth,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Đăng ký tài khoản mới',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.035,
+                        ),
+                      ),
+                    )
+                ),
+              ),
+            ],
+          ),
       )
     );
   }
 }
+
+
