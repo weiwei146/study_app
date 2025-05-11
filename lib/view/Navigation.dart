@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:study_app/assets/MyColors.dart';
 import 'package:study_app/view/HomeScreen.dart';
 import 'package:study_app/view/SettingScreen.dart';
-import 'package:study_app/view/TestScreen.dart';
 
 class Navigation extends StatefulWidget {
   final int initialIndex;
@@ -29,7 +28,6 @@ class _NavigationState extends State<Navigation> {
     _selectedIndex = widget.initialIndex;
     _widgetOptions = <Widget>[
       const HomeScreen(),
-      const TestScreen(),
       const SettingScreen()
     ];
   }
@@ -55,19 +53,13 @@ class _NavigationState extends State<Navigation> {
             ),
             BottomNavigationBarItem(
               icon: Icon(
-                  Icons.menu_book
-              ),
-              label: 'Kiểm tra',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
                   Icons.settings
               ),
               label: 'Cài đặt',
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.yellow,
+          selectedItemColor: Colors.orange,
           unselectedItemColor: Colors.white70,
           onTap: _onItemTapped,
         )

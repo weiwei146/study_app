@@ -1,10 +1,53 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:study_app/assets/MyColors.dart';
-import 'package:study_app/view/SearchScreen.dart';
+import 'package:study_app/view/WordScreen.dart';
+import '../api/api_service.dart';
+import '../model/Lesson.dart';
+import 'QuizScreen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Lesson> lessons = [];
+  late ApiService apiService;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    apiService = ApiService();
+    setState(() {
+      isLoading = true;
+    });
+    apiService.getLessons().then((data) {
+      if (mounted) {
+        setState(() {
+          lessons = data;
+          isLoading = false;
+        });
+      }
+    });
+  }
+
+  static const Map<String, IconData> iconMap = {
+    'chat': Icons.chat,
+    'person': Icons.person,
+    'home': Icons.home,
+    'restaurant': Icons.restaurant,
+    'flight': Icons.flight,
+    'favorite': Icons.favorite,
+    'work': Icons.work,
+    'school': Icons.school,
+    'nature': Icons.nature,
+    'devices': Icons.devices
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -13,47 +56,37 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 80,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SearchScreen()),
-              );
-            },
-            child: AbsorbPointer(
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: MyColors.searchInput,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: const CupertinoSearchTextField(
-                  placeholder: 'Tìm kiếm',
-                  backgroundColor: Colors.transparent,
-                  borderRadius: BorderRadius.zero,
-                  prefixIcon: Icon(
-                    CupertinoIcons.search,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
       body: SingleChildScrollView (
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(
+            top: 30,
+            right: 20,
+            left: 20,
+            bottom: 20
+          ),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                AbsorbPointer(
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: MyColors.searchInput,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: const CupertinoSearchTextField(
+                      placeholder: 'Tìm kiếm',
+                      backgroundColor: Colors.transparent,
+                      borderRadius: BorderRadius.zero,
+                      prefixIcon: Icon(
+                        CupertinoIcons.search,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20,),
                 Text(
                   " Các học phần",
                   style: TextStyle(
@@ -62,66 +95,27 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 10,),
                 SizedBox(
-                  height: 150,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
+                  height: 450,
+                  child: Stack(
                     children: [
-                      //cho nay sau connect data thì get list la duoc
-                      //day dang fix data cung
-                      listGrade("LESSION 11 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 12 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 13 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 14 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 15 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      //ấn vào đây thì chuyển sang trang show full list học phần
-                      IconButton(
-                          onPressed: () {
-
-                          },
-                          icon: Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          )
-                      )
+                      ListView(
+                        scrollDirection: Axis.vertical,
+                        children: [
+                          ...lessons.map((lesson) => listGrade(lesson!)).toList(),
+                        ],
+                      ),
+                      if (isLoading)
+                        Container(
+                          color: Colors.transparent,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 30,),
-                Text(
-                  " Tương tự học phần của user.name",
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.035,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10,),
-                SizedBox(
-                  height: 150,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      //cho nay sau connect data thì get list la duoc
-                      //day dang fix data cung
-                      listGrade("LESSION 11 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 12 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 13 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 14 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      listGrade("LESSION 15 (Submarine Reading", 'https://i.pravatar.cc/300'),
-                      //ấn vào đây thì chuyển sang trang show full list học phần
-                      IconButton(
-                          onPressed: () {
-
-                          },
-                          icon: Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          )
-                      )
-                    ],
-                  ),
+                  )
                 ),
                 const SizedBox(height: 30,),
                 SizedBox(
@@ -143,7 +137,7 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.folder,
-                            color: Colors.yellow,
+                            color: Colors.indigo,
                             size: screenWidth * 0.15,
                           ),
                           Text(
@@ -199,14 +193,46 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-  Widget listGrade(String title, String url) {
+  Widget listGrade(Lesson lesson) {
     return Padding(
       padding: EdgeInsets.all(5),
       child: SizedBox(
-        width: 270,
         child: GestureDetector(
           onTap: () {
-            print('Tapped on $title');
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("Xác nhận"),
+                  content: Text('Lựa chọn yêu cầu của bạn'),
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => WordScreen(lesson: lesson,)));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Học từ vựng'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>QuizScreen(lesson: lesson,)));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Làm Quiz'),
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Container(
             decoration: BoxDecoration(
@@ -224,29 +250,36 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    title,
+                    lesson.title,
+                    style: const TextStyle(
+                      color: Colors.orange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+                  Text(
+                    lesson.description,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 10,),
                   Row(
                     children: [
-                      tag("70 thuật ngữ"),
+                      tag(lesson.status),
                       const SizedBox(width: 8),
-                      tag("Ảnh", icon: Icons.image),
+                      tag("Bài học số " + lesson.lessonNumber.toString()),
                     ],
                   ),
                   const SizedBox(height: 20,),
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundImage: NetworkImage(url),
+                      Icon(
+                        iconMap[lesson.icon] ?? Icons.help,
+                        color: Colors.white,
                       ),
                       const SizedBox(width: 8),
-                      Text("author", style: const TextStyle(color: Colors.white)),
+                      Text(lesson.icon, style: const TextStyle(color: Colors.white)),
                       const Spacer(),
                       const Icon(Icons.more_vert, color: Colors.white),
                     ],
@@ -272,7 +305,8 @@ class HomeScreen extends StatelessWidget {
             Icon(icon, size: 14, color: Colors.white),
             const SizedBox(width: 4),
           ],
-          Text(text,
+          Text(
+              text == "not started" ? "Chưa học" : text,
               style: const TextStyle(
               color: Colors.white,
               fontSize: 12, fontWeight: FontWeight.bold,

@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-import 'package:study_app/assets/MyColors.dart';
+import '../assets/MyColors.dart';
+import '../model/Lesson.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class QuizScreen extends StatefulWidget {
+  final Lesson lesson;
+
+  const QuizScreen({super.key, required this.lesson});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<QuizScreen> createState() => _QuizScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -21,14 +23,15 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-
-            ],
+          title: Text(
+            widget.lesson.title,
+            style: TextStyle(
+                color: Colors.white
+            ),
           ),
+        ),
+        body: Center(
+
         )
     );
   }
