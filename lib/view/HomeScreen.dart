@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_app/assets/MyColors.dart';
 import 'package:study_app/view/WordScreen.dart';
 import '../api/api_service.dart';
@@ -18,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Lesson> lessons = [];
   late ApiService apiService;
   bool isLoading = false;
+  bool isLoadingStart = false;
 
   @override
   void initState() {
@@ -36,6 +38,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void startLesson(Lesson lesson) async {
+    setState(() {
+      isLoadingStart = true;
+    });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? check = prefs.getBool('user_isLearningStarted');
+    if(!check!) {
+      await apiService.startLearning(lesson.id);
+    }
+    await apiService.startLesson(lesson.id);
+
+    setState(() {
+      isLoadingStart = false;
+    });
+
+  }
+
   static const Map<String, IconData> iconMap = {
     'chat': Icons.chat,
     'person': Icons.person,
@@ -49,148 +69,168 @@ class _HomeScreenState extends State<HomeScreen> {
     'devices': Icons.devices
   };
 
+  static const Map<String, String> statusMap = {
+    'not started': "Chưa học",
+    'locked': "Bị khóa",
+    'in progress': "Đang học",
+    'completed': "Hoàn thành"
+  };
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: MyColors.backgroundColor,
-      body: SingleChildScrollView (
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 30,
-            right: 20,
-            left: 20,
-            bottom: 20
-          ),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AbsorbPointer(
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: MyColors.searchInput,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: const CupertinoSearchTextField(
-                      placeholder: 'Tìm kiếm',
-                      backgroundColor: Colors.transparent,
-                      borderRadius: BorderRadius.zero,
-                      prefixIcon: Icon(
-                        CupertinoIcons.search,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: MyColors.backgroundColor,
+          body: SingleChildScrollView (
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 30,
+                    right: 20,
+                    left: 20,
+                    bottom: 20
                 ),
-                const SizedBox(height: 20,),
-                Text(
-                  " Các học phần",
-                  style: TextStyle(
-                      fontSize: screenWidth * 0.035,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(
-                  height: 450,
-                  child: Stack(
-                    children: [
-                      ListView(
-                        scrollDirection: Axis.vertical,
-                        children: [
-                          ...lessons.map((lesson) => listGrade(lesson!)).toList(),
-                        ],
-                      ),
-                      if (isLoading)
-                        Container(
-                          color: Colors.transparent,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AbsorbPointer(
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: MyColors.searchInput,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: const CupertinoSearchTextField(
+                          placeholder: 'Tìm kiếm',
+                          backgroundColor: Colors.transparent,
+                          borderRadius: BorderRadius.zero,
+                          prefixIcon: Icon(
+                            CupertinoIcons.search,
+                            color: Colors.white,
                           ),
                         ),
-                    ],
-                  )
-                ),
-                const SizedBox(height: 30,),
-                SizedBox(
-                  height: screenHeight * 0.3,
-                  width: screenWidth,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: MyColors.backgroundColor,
-                      border: Border.all(
-                        color: MyColors.searchInput,
-                        width: 4,
                       ),
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            Icons.folder,
-                            color: Colors.indigo,
-                            size: screenWidth * 0.15,
-                          ),
-                          Text(
-                            "Học phần",
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                    const SizedBox(height: 20,),
+                    Text(
+                      " Các học phần",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                        height: 450,
+                        child: Stack(
+                          children: [
+                            ListView(
+                              scrollDirection: Axis.vertical,
+                              children: [
+                                ...lessons.map((lesson) => listGrade(lesson!)).toList(),
+                              ],
                             ),
-                          ),
-                          Text(
-                            "Sắp xếp các học phần cho những chủ đề khác nhau mà bạn đang học",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              color: Colors.white,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: Container(
-                              width: screenWidth,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: MyColors.backgroundColor,
-                                border: Border.all(
-                                  color: MyColors.searchInput,
-                                  width: 4,
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'Thêm học phần',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold
+                            if (isLoading)
+                              Container(
+                                color: Colors.transparent,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
                                   ),
                                 ),
-                              )
+                              ),
+                          ],
+                        )
+                    ),
+                    const SizedBox(height: 30,),
+                    SizedBox(
+                        height: screenHeight * 0.3,
+                        width: screenWidth,
+                        child: Container(
+                            decoration: BoxDecoration(
+                              color: MyColors.backgroundColor,
+                              border: Border.all(
+                                color: MyColors.searchInput,
+                                width: 4,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          )
-                        ],
-                      ),
-                    )
-                  )
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Icon(
+                                    Icons.folder,
+                                    color: Colors.indigo,
+                                    size: screenWidth * 0.15,
+                                  ),
+                                  Text(
+                                    "Học phần",
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.04,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Sắp xếp các học phần cho những chủ đề khác nhau mà bạn đang học",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.04,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+
+                                    },
+                                    child: Container(
+                                        width: screenWidth,
+                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: MyColors.backgroundColor,
+                                          border: Border.all(
+                                            color: MyColors.searchInput,
+                                            width: 4,
+                                          ),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            'Thêm học phần',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold
+                                            ),
+                                          ),
+                                        )
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                        )
+                    ),
+                  ],
                 ),
-              ],
+              )
+          ),
+        ),
+        if (isLoadingStart)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
             ),
-        )
-      ),
+          ),
+      ],
     );
   }
   Widget listGrade(Lesson lesson) {
@@ -209,6 +249,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   actions: [
                     ElevatedButton(
                       onPressed: () {
+                        startLesson(lesson);
+                        print(lesson.status);
                         Navigator.pop(context);
                         Navigator.push(context, MaterialPageRoute(builder: (context) => WordScreen(lesson: lesson,)));
                       },
@@ -266,9 +308,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 10,),
                   Row(
                     children: [
-                      tag(lesson.status),
+                      tag1(lesson.status),
                       const SizedBox(width: 8),
-                      tag("Bài học số " + lesson.lessonNumber.toString()),
+                      tag2("Bài học số " + lesson.lessonNumber.toString()),
                     ],
                   ),
                   const SizedBox(height: 20,),
@@ -292,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  Widget tag(String text, {IconData? icon}) {
+  Widget tag1(String text, {IconData? icon}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -306,11 +348,36 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 4),
           ],
           Text(
-              text == "not started" ? "Chưa học" : text,
+              statusMap[text] ?? "",
               style: const TextStyle(
               color: Colors.white,
               fontSize: 12, fontWeight: FontWeight.bold,
            )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget tag2(String text, {IconData? icon}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2B4E),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: Colors.white),
+            const SizedBox(width: 4),
+          ],
+          Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12, fontWeight: FontWeight.bold,
+              )
           ),
         ],
       ),
